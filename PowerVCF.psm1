@@ -1087,6 +1087,10 @@ Function Get-VCFCluster {
         Get-VCFCluster -id 8423f92e-e4b9-46e7-92f7-befce4755ba2
         This example shows how to retrieve a cluster by unique ID.
 
+        .EXAMPLE
+        Get-VCFCluster -id 8423f92e-e4b9-46e7-92f7-befce4755ba2 -checkImageCompliance
+        This example shows how to check a cluster's image compliance by unique ID.
+
         .PARAMETER name
         Specifies the name of the cluster.
 
@@ -1095,12 +1099,16 @@ Function Get-VCFCluster {
 
         .PARAMETER vdses
         Specifies retrieving the vSphere Distributed Switches (VDS) for the cluster.
+
+        .PARAMETER -checkImageCompliance
+        Checks if the cluster is compatible with vLCM Image.
     #>
 
     Param (
         [Parameter (Mandatory = $false)] [ValidateNotNullOrEmpty()] [String]$name,
         [Parameter (Mandatory = $false)] [ValidateNotNullOrEmpty()] [String]$id,
-        [Parameter (Mandatory = $false)] [ValidateNotNullOrEmpty()] [Switch]$vdses
+        [Parameter (Mandatory = $false)] [ValidateNotNullOrEmpty()] [Switch]$vdses,
+        [Parameter (Mandatory = $false)] [ValidateNotNullOrEmpty()] [Switch]$checkImageCompliance
     )
 
     createHeader # Set the Accept and Authorization headers.
@@ -1116,6 +1124,9 @@ Function Get-VCFCluster {
                 $uri = "https://$sddcManager/v1/clusters/$id/vdses"
             } else {
                 $uri = "https://$sddcManager/v1/clusters/$id"
+            }
+            if ($PsBoundParameters.ContainsKey("checkImageCompliance")) {
+                $uri = "https://$sddcManager/v1/clusters/$id/image-compliance"
             }
             $response = Invoke-RestMethod -Method GET -Uri $uri -Headers $headers
             $response
