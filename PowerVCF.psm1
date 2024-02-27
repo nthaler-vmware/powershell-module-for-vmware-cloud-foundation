@@ -1125,10 +1125,16 @@ Function Get-VCFCluster {
             } else {
                 $uri = "https://$sddcManager/v1/clusters/$id"
             }
-            if ($PsBoundParameters.ContainsKey("checkImageCompliance")) {
-                $uri = "https://$sddcManager/v1/clusters/$id/image-compliance"
-            }
             $response = Invoke-RestMethod -Method GET -Uri $uri -Headers $headers
+            if ($PsBoundParameters.ContainsKey("checkImageCompliance")) {
+                if ($response.isImageBased) {
+                    $uri = "https://$sddcManager/v1/clusters/$id/image-compliance"
+                    $response = Invoke-RestMethod -Method GET -Uri $uri -Headers $headers
+                } else {
+                    Write-Output "Error: Cluster $id is vLCM Baseline Managed"
+                    break
+                }
+            }
             $response
         }
         if ($PsBoundParameters.ContainsKey("name")) {
